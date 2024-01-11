@@ -1,12 +1,11 @@
-import { IItem, IItemWithTax } from "./interface";
-import readline from "readline-sync";
+import { IItem } from "./classes";
 
 export function readALine(): string {
-  const answer = readline.question("");
-  return answer;
+  const readline = require("readline-sync");
+  return readline.question("");
 }
+
 export function isValidItemDetailsString(s: string): boolean {
-  const example = "-name Soap -price 10 -quantity 10 -type raw";
   let pattern =
     /^-name\s\S+(?=.*-price\s\d+)(?=.*-quantity\s\d+)(?=.*-type\s(raw|manufactured|imported)).*$/;
   if (!pattern.test(s)) {
@@ -41,20 +40,25 @@ export function isValidItemDetailsString(s: string): boolean {
 }
 
 export function calculateTax(item: IItem): number {
-  let tax = 0;
+  let IndividualTax = 0,
+    tax = 0;
   if (item.type === "raw") {
-    tax = item.price * 0.125;
+    IndividualTax = item.price * 0.125;
+    tax = IndividualTax * item.quantity;
   } else if (item.type === "manufactured") {
-    tax = item.price * 0.125 + 0.02 * (item.price + item.price * 0.125);
+    IndividualTax =
+      item.price * 0.125 + 0.02 * (item.price + item.price * 0.125);
+    tax = IndividualTax * item.quantity;
   } else if (item.type === "imported") {
-    tax = item.price * 0.1;
+    IndividualTax = item.price * 0.1;
+    tax = IndividualTax * item.quantity;
     const finalPrice = item.price + tax;
     if (finalPrice <= 100) {
       tax += 5;
     } else if (finalPrice > 100 && finalPrice <= 200) {
       tax += 10;
     } else {
-      tax += 0.05 * (item.price + tax);
+      tax += 0.05 * finalPrice;
     }
   }
   return tax;
@@ -65,20 +69,6 @@ export function getItemFromString(s: string): IItem {
   if (!isValidItemDetailsString(s)) {
     throw new Error("Invalid Input");
   }
-
-  // let parts = s.split("-");
-  // parts.shift();
-  // for (let p of parts) {
-  //   let arr = p.split(" ");
-  //   let key = arr[0];
-  //   arr.shift();
-  //   let value: string = arr.join(" ");
-  //   Item[key] = value;
-  //   if (key === "price" || key === "quantity") {
-  //     Item[key] = parseFloat(value);
-  //   }
-  // }
-
   let nameMatch = s.match(/-name (\S+)/g);
   let priceMatch = s.match(/-price (\d+)/);
   let quantityMatch = s.match(/-quantity (\d+)/);
@@ -104,21 +94,4 @@ export function getItemFromString(s: string): IItem {
     type,
   };
   return Item;
-}
-
-export function getItemWithTax(item: IItem): IItemWithTax {
-  let itemWithTax: IItemWithTax;
-  let tax = calculateTax(item);
-  let finalPrice = item.price + tax;
-  let salesTaxLiabilityPerItem = tax / item.quantity;
-  itemWithTax = {
-    ...item,
-    finalPrice,
-    salesTaxLiabilityPerItem,
-  };
-  return itemWithTax;
-}
-
-export function add(a: number, b: number): number {
-  return a + b;
 }
