@@ -5,3 +5,4 @@ export function main() {
   nucleiSalesTaxCalculator.run();
   return 0;
 }
+main();

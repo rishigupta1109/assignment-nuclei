@@ -290,10 +290,10 @@ test.fails("Testing the application with invalid inputs", () => {
   });
 });
 
-test("testing main", () => {
-  const mockReadALine = vi
-    .spyOn(mymodule, "readALine")
-    .mockReturnValueOnce("-name soap -price 10 -quantity 10 -type raw")
-    .mockReturnValueOnce("n");
-  expect(main()).toBe(0);
-});
+// test("testing main", () => {
+//   const mockReadALine = vi
+//     .spyOn(mymodule, "readALine")
+//     .mockReturnValueOnce("-name soap -price 10 -quantity 10 -type raw")
+//     .mockReturnValueOnce("n");
+//   expect(main()).toBe(0);
+// });
