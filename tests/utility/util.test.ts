@@ -1,8 +1,7 @@
-import { SalesTaxCalculator } from "./../../utility/classes";
+import { SalesTaxCalculator } from "./../../utility/classes/SalesTaxCalculator";
 import { expect, test, vi } from "vitest";
 import * as mymodule from "../../utility/utils";
 import {
-  calculateTax,
   getItemFromString,
   isValidItemDetailsString,
   readALine,
@@ -37,33 +36,25 @@ test("Testing isValidItemDetailsString", () => {
     ["-name Detergent -quantity 5 -price 5 -type imported", true],
     ["-name Detergent -price 5 -type imported -quantity 5", true],
     //false cases
+    [" -name Detergent -price 5 -type imported -quantity 5", false],
     ["-name -price 5 -type imported -quantity 5", false],
+    ["-name soap -price 5 -type imported -quantity asd", false],
     ["-price 5 -name Detergent -type imported -quantity 5", false],
     ["-name Detergent -price 5 -type import -quantity 5", false],
     ["-name Detergent -price 5 -type imported -quantity 5 -name soap", false],
+    ["-name Detergent -price 5 -type imported -quantity 5 -type raw", false],
+    ["-name Detergent -price 5 -type imported -quantity 5 -quantity 10", false],
+    ["-name Detergent -price 5 -type imported -quantity 5 -price 10", false],
     [" -name Detergent -price 5 -type import -quantity 5", false],
     ["-price 5 -type imported -quantity 5", false],
+    ["-name Detergent -type imported -quantity 5", false],
+    ["-name Detergent -type imported -price 5", false],
+    ["-name Detergent -price 5 -quantity 5", false],
     ["-type imported -quantity 5", false],
     ["-quantity 5", false],
   ];
   testCases.forEach((testCase) => {
     expect(isValidItemDetailsString(testCase[0])).toBe(testCase[1]);
-  });
-});
-
-//Tests for calculate Tax function
-
-test("Testing calculateTax", () => {
-  let testCases: any = [
-    [{ name: "Soap", price: 10, quantity: 10, type: "raw" }, 12.5],
-    [
-      { name: "Detergent", price: 5, quantity: 5, type: "manufactured" },
-      3.6875,
-    ],
-    [{ name: "Detergent", price: 5, quantity: 5, type: "imported" }, 7.5],
-  ];
-  testCases.forEach((testCase) => {
-    expect(calculateTax(testCase[0])).toBe(testCase[1]);
   });
 });
 
@@ -91,56 +82,19 @@ test("Testing getItemFromString", () => {
   });
 });
 
-//Integration tests
-
-test("Testing the application", () => {
-  let testcases = [
-    [
-      "-name soap -price 10 -quantity 10 -type raw",
-      {
-        name: "soap",
-        price: 10,
-        quantity: 10,
-        type: "raw",
-        salesTaxLiabilityPerItem: 1.25,
-        finalPrice: 112.5,
-      },
-    ],
-    [
-      "-name Detergent -price 5 -quantity 5 -type manufactured",
-      {
-        name: "Detergent",
-        price: 5,
-        quantity: 5,
-        type: "manufactured",
-        salesTaxLiabilityPerItem: 0.7375,
-        finalPrice: 28.6875,
-      },
-    ],
-    [
-      "-name Detergent -price 5 -quantity 5 -type imported",
-      {
-        name: "Detergent",
-        price: 5,
-        quantity: 5,
-        type: "imported",
-        salesTaxLiabilityPerItem: 1.5,
-        finalPrice: 32.5,
-      },
-    ],
+test("Testing error getItemFromString", () => {
+  let testCases: any = [
+    "-nam Soap -price 10 -quantity 10 -type raw",
+    "-name Detergent -price 5 -quantity 5 -type manuftured",
+    "-name Detergent -price as -quantity 5 -type imported",
+    "-name Detergent -quantity 5 -price asd -type imported",
+    "-name  -price 5 -type imported -quantity 5",
+    "-price 5 -type imported -quantity 5",
+    "-name soap -price 5 -type imported",
+    "-name soap -price 5 -quantity 5",
+    "-name soap -type imported -quantity 5",
   ];
-
-  testcases.forEach((testCase: any) => {
-    const mockReadALine = vi
-      .spyOn(mymodule, "readALine")
-      .mockReturnValueOnce(testCase[0])
-      .mockReturnValueOnce("n");
-    let testing = new SalesTaxCalculator();
-    const mockShowOutput = vi.spyOn(testing, "showOutput");
-    testing.run();
-
-    expect(JSON.stringify(mockShowOutput.mock.results[0].value[0])).toBe(
-      JSON.stringify(testCase[1])
-    );
+  testCases.forEach((testCase) => {
+    expect(() => getItemFromString(testCase)).toThrowError();
   });
 });

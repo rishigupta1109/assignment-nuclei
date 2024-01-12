@@ -1,53 +1,12 @@
-import readline from "readline-sync";
-import { calculateTax, getItemFromString, readALine } from "./utils";
-export class IItem {
-  name: string;
-  price: number;
-  quantity: number;
-  type: "raw" | "manufactured" | "imported";
-  constructor({
-    name,
-    price,
-    quantity,
-    type,
-  }: {
-    name: string;
-    price: number;
-    quantity: number;
-    type: "raw" | "manufactured" | "imported";
-  }) {
-    this.name = name;
-    this.price = price;
-    this.quantity = quantity;
-    this.type = type;
-  }
-}
-export class IItemWithTax extends IItem {
-  private salesTaxLiabilityPerItem: number;
-  private finalPrice: number;
-  constructor(s: string) {
-    let item = getItemFromString(s);
-    super(item);
-    let tax = calculateTax(item);
-    this.salesTaxLiabilityPerItem = parseFloat(
-      (tax / item.quantity).toPrecision(4)
-    );
-    this.finalPrice = item.price * item.quantity + tax;
-  }
-  print(): void {
-    console.log(
-      this.name,
-      this.price,
-      this.quantity,
-      this.type,
-      this.salesTaxLiabilityPerItem,
-      this.finalPrice
-    );
-  }
-}
+// import { IItemWithTax } from "../classes";
+import { typesClassMap } from "../constant";
+import { getItemFromString, readALine } from "../utils";
+import { ImportedItem } from "./ImportedItem";
+import { ManufacturedItem } from "./ManufacturedItem";
+import { RawItem } from "./RawItem";
 
 export class SalesTaxCalculator {
-  itemsWithTax: IItemWithTax[];
+  itemsWithTax: Array<ManufacturedItem | RawItem | ImportedItem>;
   constructor() {
     this.itemsWithTax = [];
   }
@@ -72,7 +31,8 @@ export class SalesTaxCalculator {
     console.log("Enter details of item :");
     try {
       const tempItemString = readALine() as string;
-      const itemWithTax = new IItemWithTax(tempItemString);
+      const item = getItemFromString(tempItemString);
+      const itemWithTax = typesClassMap[item.type](item);
       this.itemsWithTax.push(itemWithTax);
     } catch (err: any) {
       console.error(err?.message);

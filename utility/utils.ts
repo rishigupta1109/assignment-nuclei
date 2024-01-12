@@ -1,4 +1,4 @@
-import { IItem } from "./classes";
+import { Item } from "./classes/Item";
 
 export function readALine(): string {
   const readline = require("readline-sync");
@@ -16,9 +16,7 @@ export function isValidItemDetailsString(s: string): boolean {
   let priceMatch = s.match(/-price\s(\d+)/g);
   let quantityMatch = s.match(/-quantity\s(\d+)/g);
   let typeMatch = s.match(/-type\s(raw|manufactured|imported)/g);
-  if (!nameMatch || !priceMatch || !quantityMatch || !typeMatch) {
-    return false;
-  }
+
   if (nameMatch && nameMatch.length > 1) {
     console.log("Multiple names found");
     return false;
@@ -39,33 +37,7 @@ export function isValidItemDetailsString(s: string): boolean {
   return true;
 }
 
-export function calculateTax(item: IItem): number {
-  let IndividualTax = 0,
-    tax = 0;
-  if (item.type === "raw") {
-    IndividualTax = item.price * 0.125;
-    tax = IndividualTax * item.quantity;
-  } else if (item.type === "manufactured") {
-    IndividualTax =
-      item.price * 0.125 + 0.02 * (item.price + item.price * 0.125);
-    tax = IndividualTax * item.quantity;
-  } else if (item.type === "imported") {
-    IndividualTax = item.price * 0.1;
-    tax = IndividualTax * item.quantity;
-    const finalPrice = item.price + tax;
-    if (finalPrice <= 100) {
-      tax += 5;
-    } else if (finalPrice > 100 && finalPrice <= 200) {
-      tax += 10;
-    } else {
-      tax += 0.05 * finalPrice;
-    }
-  }
-  return tax;
-}
-
-export function getItemFromString(s: string): IItem {
-  const example = "-name Soap -price 10 -quantity 10 -type raw";
+export function getItemFromString(s: string): Item {
   if (!isValidItemDetailsString(s)) {
     throw new Error("Invalid Input");
   }
@@ -87,7 +59,7 @@ export function getItemFromString(s: string): IItem {
   ) {
     throw new Error("Invalid Input");
   }
-  let Item: IItem = {
+  let Item: Item = {
     name,
     price,
     quantity,

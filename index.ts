@@ -1,4 +1,7 @@
-import { SalesTaxCalculator } from "./utility/classes";
+import { SalesTaxCalculator } from "./utility/classes/SalesTaxCalculator";
 
-let nucleiSalesTaxCalculator = new SalesTaxCalculator();
-nucleiSalesTaxCalculator.run();
+export function main() {
+  let nucleiSalesTaxCalculator = new SalesTaxCalculator();
+  nucleiSalesTaxCalculator.run();
+  return 0;
+}
