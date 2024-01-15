@@ -1,12 +1,10 @@
 // import { IItemWithTax } from "../classes";
 import { typesClassMap } from "../constant";
 import { getItemFromString, readALine } from "../utils";
-import { ImportedItem } from "./ImportedItem";
-import { ManufacturedItem } from "./ManufacturedItem";
-import { RawItem } from "./RawItem";
+import { Item } from "./Item";
 
 export class SalesTaxCalculator {
-  itemsWithTax: Array<ManufacturedItem | RawItem | ImportedItem>;
+  itemsWithTax: Array<Item>;
   constructor() {
     this.itemsWithTax = [];
   }

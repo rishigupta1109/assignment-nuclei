@@ -1,10 +1,13 @@
 import { ImportedItem } from "./classes/ImportedItem";
 import { Item } from "./classes/Item";
-import { ManufacturedItem } from "./classes/ManufacturedItem";
-import { RawItem } from "./classes/RawItem";
+import {
+  ImportedItemCreator,
+  ManufacturedItemCreator,
+  RawItemCreator,
+} from "./classes/ItemCreator";
 
 export let typesClassMap = {
-  raw: (item: Item) => new RawItem(item),
-  manufactured: (item: Item) => new ManufacturedItem(item),
-  imported: (item: Item) => new ImportedItem(item),
+  raw: (item: Item) => new RawItemCreator().create(item),
+  manufactured: (item: Item) => new ManufacturedItemCreator().create(item),
+  imported: (item: Item) => new ImportedItemCreator().create(item),
 };
